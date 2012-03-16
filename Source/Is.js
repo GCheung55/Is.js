@@ -25,7 +25,7 @@ var Type = window.Type = function(name, object){
 	
 	str = 'is' + name,
 	
-	Is[name] = Type[str] = oldType[str];
+	Is[name] = Is.not[name] = Type[str] = oldType[str];
 	
 	return obj;
 }.extend(oldType);
