@@ -1,17 +1,19 @@
 {
-  "author": "Garrick Cheung <garrick@garrickcheung.com> (http://garrickcheung.com)",
-  "name": "neuro-is",
-  "description": "MooTools Type-Test Utility",
-  "version": "0.0.2",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/GCheung55/Is.js.git"
-  },
-  "main": "Source/Is.js",
-  "dependencies": {},
-  "devDependencies": {},
-  "optionalDependencies": {},
-  "engines": {
-    "node": "*"
-  }
+    "author": "Garrick Cheung <garrick@garrickcheung.com> (http://garrickcheung.com)",
+    "name": "neuro-is",
+    "description": "MooTools Type-Test Utility",
+    "version": "0.0.2",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/GCheung55/Is.js.git"
+    },
+    "main": "Source/Is.js",
+    "dependencies": {
+        "mootools": ">=1.4.5"
+    },
+    "devDependencies": {},
+    "optionalDependencies": {},
+    "engines": {
+        "node": "*"
+    }
 }
