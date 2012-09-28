@@ -9,15 +9,15 @@
  * @requires [MooTools-Core]
  */
 
-(function(context){
+(function(context, global){
 
 var toString = Object.prototype.toString,
     hasOwnProperty = Object.prototype.hasOwnProperty,
-    oldType = window.Type,
+    oldType = global.Type,
     Is = context.Is = {};
 	
 // Wrap oldType so that any new Type will also add to Is object
-var Type = window.Type = function(name, object){
+var Type = global.Type = function(name, object){
 	var obj = new oldType(name, object),
 		str;
 	
@@ -170,4 +170,4 @@ Is.Equal = function(a, b){
     obj.not = not;
 })(Is);
 
-})(typeof exports != 'undefined' ? exports : window);
+})(typeof exports != 'undefined' ? exports : window, this.window || global);
