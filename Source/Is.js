@@ -81,7 +81,7 @@ var has = function(obj, key){
 }
 
 // Internal recursive comparison function.
-var eq = function(a, b, stack) {
+var eq = function(a, b, aStack, bStack) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
     // See the Harmony `egal` proposal: http://wiki.ecmascript.org/doku.php?id=harmony:egal.
     if (a === b) return a !== 0 || 1 / a == 1 / b;
@@ -102,19 +102,20 @@ var eq = function(a, b, stack) {
         return matchMap[typeA](a, b);
     }
 
-    if (typeA != 'object' || typeB != 'object') return false;
+    if (typeof a != 'object' || typeof b != 'object') return false;
 
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
     // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
-    var length = stack.length;
+    var length = aStack.length;
     while (length--) {
         // Linear search. Performance is inversely proportional to the number of
         // unique nested structures.
-        if (stack[length] == a) return true;
+        if (aStack[length] == a) return bStack[length] == b;
     }
 
-    // Add the first object to the stack of traversed objects.
-    stack.push(a);
+    // Add the first object to the aStack of traversed objects.
+    aStack.push(a);
+    bStack.push(b);
     var size = 0, result = true;
     // Recursively compare objects and arrays.
     if (typeA == 'array') {
@@ -125,19 +126,25 @@ var eq = function(a, b, stack) {
             // Deep compare the contents, ignoring non-numeric properties.
             while (size--) {
                 // Ensure commutative equality for sparse arrays.
-                if (!(result = size in a == size in b && eq(a[size], b[size], stack))) break;
+                if (!(result = eq(a[size], b[size], aStack, bStack))) break;
             }
         }
     } else {
-        // Objects with different constructors are not equivalent.
-        if ('constructor' in a != 'constructor' in b || a.constructor != b.constructor) return false;
+        // Objects with different constructors are not equivalent, but `Object`s
+        // from different frames are.
+        var aConstructor = a.constructor, bConstructor = b.constructor;
+        if (aConstructor !== bConstructor 
+            && !(Is.Function(aConstructor) 
+                && instanceOf(aConstructor, aConstructor) 
+                && Is.Function(bConstructor) 
+                && instanceOf(bConstructor, bConstructor))) return false;
         // Deep compare objects.
         for (var key in a) {
             if (has(a, key)) {
                 // Count the expected number of properties.
                 size++;
                 // Deep compare each member.
-                if (!(result = has(b, key) && eq(a[key], b[key], stack))) break;
+                if (!(result = has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
             }
         }
         // Ensure that both objects contain the same number of properties.
@@ -148,13 +155,14 @@ var eq = function(a, b, stack) {
             result = !size;
         }
     }
-    // Remove the first object from the stack of traversed objects.
-    stack.pop();
+    // Remove the first object from the aStack of traversed objects.
+    aStack.pop();
+    bStack.pop();
     return result;
 }
 
 Is.Equal = function(a, b){
-    return eq(a, b, []);
+    return eq(a, b, [], []);
 };
 
 //One out of the Testigo book (thanks keeto)
